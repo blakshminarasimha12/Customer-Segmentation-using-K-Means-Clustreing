@@ -1,0 +1,165 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Customer Segmentation using K-Means Clustering\n",
+        "This notebook implements customer segmentation using preprocessing, the Elbow Method, K-Means clustering, visualization, and cluster interpretation."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.cluster import KMeans\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "df = pd.read_csv('../data/customers.csv')\n",
+        "df.head()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "df.info()\n",
+        "print('\\nMissing values:\\n', df.isnull().sum())\n",
+        "df = df.drop_duplicates().copy()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "df['Gender_Code'] = df['Gender'].map({'Male': 0, 'Female': 1})\n",
+        "features = ['Age', 'Annual_Income', 'Spending_Score', 'Purchase_Frequency']\n",
+        "X = df[features]\n",
+        "scaler = StandardScaler()\n",
+        "X_scaled = scaler.fit_transform(X)\n",
+        "print('Scaled shape:', X_scaled.shape)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Elbow Method\n",
+        "WCSS measures the total within-cluster variation. We inspect several K values and look for the elbow."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "wcss = []\n",
+        "K = range(2, 11)\n",
+        "for k in K:\n",
+        "    model = KMeans(n_clusters=k, random_state=42, n_init=10)\n",
+        "    model.fit(X_scaled)\n",
+        "    wcss.append(model.inertia_)\n",
+        "\n",
+        "plt.figure(figsize=(8,5))\n",
+        "plt.plot(list(K), wcss, marker='o')\n",
+        "plt.title('Elbow Method for Optimal K')\n",
+        "plt.xlabel('Number of Clusters')\n",
+        "plt.ylabel('WCSS')\n",
+        "plt.grid(alpha=0.3)\n",
+        "plt.show()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "For this demonstration, **K = 4** is used. In a real business dataset, validate K using the elbow, silhouette score, domain knowledge, and stability checks."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)\n",
+        "df['Cluster'] = kmeans.fit_predict(X_scaled) + 1\n",
+        "df.head()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "summary = df.groupby('Cluster')[features].mean().round(2)\n",
+        "summary['Customer_Count'] = df['Cluster'].value_counts().sort_index()\n",
+        "summary"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "plt.figure(figsize=(9,6))\n",
+        "sns.scatterplot(data=df, x='Annual_Income', y='Spending_Score', hue='Cluster', palette='viridis', s=80)\n",
+        "plt.title('Customer Segmentation: Income vs Spending Score')\n",
+        "plt.xlabel('Annual Income (\u20b9)')\n",
+        "plt.ylabel('Spending Score')\n",
+        "plt.show()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Business Interpretation\n",
+        "- Compare the average income, spending score, age, and purchase frequency of each cluster.\n",
+        "- High income + high spending can indicate high-value customers.\n",
+        "- Low income + low spending can indicate budget-focused customers.\n",
+        "- Moderate groups can be targeted with personalized offers.\n",
+        "- Cluster numbers are arbitrary; interpret them using their characteristics."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "df.to_csv('../outputs/segmented_customers.csv', index=False)\n",
+        "summary.to_csv('../outputs/cluster_summary.csv')\n",
+        "print('Segmented customer data and cluster summary saved to outputs/.')"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python",
+      "version": "3.x"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
