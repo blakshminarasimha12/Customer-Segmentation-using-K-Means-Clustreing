@@ -4,18 +4,18 @@ A complete machine learning project that segments customers using the **K-Means 
 
 ## 🚀 Live Streamlit Deployment
 
-Deploy `app.py` using Streamlit Community Cloud.
+this project is deployed using Streamlit Community Cloud.
 
 **Main file path:**
 
 ```text
-app.py
+cluster_app.py
 ```
 
 After deployment, add the generated public Streamlit URL here:
 
 ```text
-https://YOUR-APP-NAME.streamlit.app
+(https://customer-segmentation-using-k-means-clustering-6sv5rqyybez8l.streamlit.app)
 ```
 
 ## 📌 Project Objective
@@ -160,5 +160,5 @@ Cluster numbers themselves have no fixed business meaning; they should be interp
 The included customer dataset is synthetic and intended for academic/project demonstration. A real business dataset can be uploaded through the Streamlit application.
 
 ## 👨‍💻 Author
-
+B.LAKSHMI NARASIMHA REDDY
 B.Tech Student | Aspiring Data Analyst
