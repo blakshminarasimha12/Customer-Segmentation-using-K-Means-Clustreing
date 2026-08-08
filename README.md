@@ -15,7 +15,7 @@ cluster_app.py
 After deployment, add the generated public Streamlit URL here:
 
 ```text
-(https://customer-segmentation-using-k-means-clustering-6sv5rqyybez8l.streamlit.app)
+https://customer-segmentation-using-k-means-clustering-6sv5rqyybez8l.streamlit.app
 ```
 
 ## 📌 Project Objective
